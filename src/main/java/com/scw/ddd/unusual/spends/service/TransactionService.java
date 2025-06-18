@@ -1,12 +1,15 @@
 package com.scw.ddd.unusual.spends.service;
 
 import com.scw.ddd.unusual.spends.domain.entity.Transaction;
+import com.scw.ddd.unusual.spends.domain.valueobject.SpendingCategory;
+import com.scw.ddd.unusual.spends.dto.SpendingByCategoryAndAmount;
 import com.scw.ddd.unusual.spends.dto.TransactionWithCategory;
 import com.scw.ddd.unusual.spends.repo.MerchantRepo;
 import com.scw.ddd.unusual.spends.repo.TransactionRepo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class TransactionService {
 
@@ -28,5 +31,41 @@ public class TransactionService {
         }
 
         return transactionsWithCategory;
+    }
+
+    public List<TransactionWithCategory> getAllTransactionWithCategory() {
+        return this.transactionsWithCategory;
+    }
+
+    public List<SpendingByCategoryAndAmount> getSpendingByCategoryAndAmountFor(
+            Set<String> creditCardIds,
+            String month,
+            List<TransactionWithCategory> transactionWithCategoryList
+    ) {
+        List<SpendingByCategoryAndAmount> spendingByCategoryAndAmountList = new ArrayList<>();
+        List<TransactionWithCategory> validTransactions = new ArrayList<>();
+
+        for (TransactionWithCategory transactionWithCategory : transactionWithCategoryList) {
+            String transactionMonth = transactionWithCategory.getTransaction().getMonth();
+            if (transactionMonth == month) {
+
+                String creditCardIdFromTransaction = transactionWithCategory.getTransaction().getCreditCardId();
+                if (creditCardIds.contains(creditCardIdFromTransaction)) {
+
+                    validTransactions.add(transactionWithCategory);
+                }
+            }
+        }
+
+        for (TransactionWithCategory transactionWithCategory : validTransactions) {
+            SpendingCategory spendingCategory = transactionWithCategory.getSpendingCategory();
+            Double amount = transactionWithCategory.getTransaction().getAmount();
+
+            var spendingByCategoryAndAmount = new SpendingByCategoryAndAmount(spendingCategory, amount);
+
+            spendingByCategoryAndAmountList.add(spendingByCategoryAndAmount);
+        }
+
+        return spendingByCategoryAndAmountList;
     }
 }
