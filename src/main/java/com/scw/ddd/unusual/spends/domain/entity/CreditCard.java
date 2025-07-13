@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreditCard {
-
     private final String number;
     private final String userId;
     private final List<String> transactionIds;
@@ -34,5 +33,9 @@ public class CreditCard {
 
     public void addTransaction(String transactionId) {
         transactionIds.add(transactionId);
+    }
+
+    public List<String> getTransaction() {
+        return transactionIds;
     }
 }
